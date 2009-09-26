@@ -15,10 +15,14 @@
     
 2.1 Options
     
-    --output -o Specify the output file to write. If only one input file is 
-                given the base name is appended with .cpp. If multiple input
-                files are specified qglrc will quit with an error.
+    --help -h     Display a brief help and usage message.
     
+    --version -v  Display the program version and exit.
+    
+    --output -o   Specify the output file to write. If only one input file is 
+                  given the base name is appended with .cpp. If multiple input
+                  files are specified qglrc will quit with an error.
+
 3. Example Usage
 
 3.1 A Single File

@@ -54,7 +54,7 @@
 
     Please report any errors, bugs and suggestions to:
     
-    http://www.iced-liquid.com/pages/contact.php
+    https://github.com/rioki/qglrc
 
 6. License 
 

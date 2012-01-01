@@ -1,17 +1,17 @@
     
-    qglrc
-    Version 0.1.0
+    ezrc
+    Version r1
     
     
 1. About
 
-    qglrc is a command line utility that packs data as C++ source code.    
+    ezrc is a command line utility that packs data as C++ source code.    
     This aproach to data handling provides a robust and portable solution when 
     data is closly bound to source code. 
 
 2. Usage
 
-    qglrc [options] <files> 
+    ezrc [options] <files> 
     
 2.1 Options
     
@@ -21,13 +21,13 @@
     
     --output -o   Specify the output file to write. If only one input file is 
                   given the base name is appended with .cpp. If multiple input
-                  files are specified qglrc will quit with an error.
+                  files are specified ezrc will quit with an error.
 
 3. Example Usage
 
 3.1 A Single File
 
-        qglrc SunIcon.jpg
+        ezrc SunIcon.jpg
     
     This will read SunIcon.jpg and create the file SunIcon.cpp. In this file 
     there will be a std::string SunIcon_jpg with the contents.
@@ -38,7 +38,7 @@
     
 3.2 Multiple Files
 
-        qglrc Toon.vert Toon.frag ToonGradient.png -o resources.cpp
+        ezrc Toon.vert Toon.frag ToonGradient.png -o resources.cpp
     
     This will read the date from Toon.vert, Toon.frag and ToonGradient.png
     and write the file resources.cpp. The file will contain the variables 
@@ -54,8 +54,8 @@
 
     Please report any errors, bugs and suggestions to:
     
-    https://github.com/rioki/qglrc
+    https://github.com/rioki/ezrc
 
 6. License 
 
-qglrc is distibuted under the GNU General Public License version 3. See COPYING.txt for details.
+ezrc is distibuted under the GNU General Public License version 3. See COPYING.txt for details.

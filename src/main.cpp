@@ -1,23 +1,24 @@
 //
-// qglrc - libqgl's resource compiler
+// ezrc - eazy resource compiler
 // Copyright (c) 2009, Sean Farrell
 // 
-// This file is part of qglrc.
+// This file is part of ezrc.
 // 
-// qglrc is free software: you can redistribute it and/or modify
+// ezrc is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 // 
-// qglrc is distributed in the hope that it will be useful,
+// ezrc is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with qglrc.  If not, see <http://www.gnu.org/licenses/>.
+// along with ezrc.  If not, see <http://www.gnu.org/licenses/>.
 // 
 
+#include <cassert>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -35,7 +36,7 @@ std::string output_file;
 //------------------------------------------------------------------------------
 void print_banner(std::ostream& os)
 {
-    os << "qglrc - libqgl's resource compiler\n"
+    os << "ezrc - eazy resource compiler\n"
           "Copyright (c) 2009 Sean Farrell \n"
           "Version: " VERSION "\n";
 }
@@ -44,7 +45,7 @@ void print_banner(std::ostream& os)
 void print_help(std::ostream& os)
 {
     os << "Usage:\n"
-          "  qglrc [Options] <Input Files>\n"
+          "  ezrc [Options] <Input Files>\n"
           "  \n"
           "Options:\n"
           "  --help -h       This help message.\n"
@@ -76,7 +77,7 @@ std::string get_base_name(const std::string& path)
 }
 
 //------------------------------------------------------------------------------
-void decode_arguments(int argc, char* argv[])
+void decode_arguments(unsigned int argc, char* argv[])
 {
     for (unsigned int i = 1; i < static_cast<unsigned int>(argc); i++)
     {

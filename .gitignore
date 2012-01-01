@@ -11,4 +11,11 @@ missing
 mkinstalldirs
 .deps
 *.o
-src/qglrc.exe
+src/ezrc.exe
+*.tags
+/ezrc.txt
+*.mk
+*.session
+/Debug
+/Release
+/bin

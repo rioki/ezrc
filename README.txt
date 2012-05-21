@@ -46,7 +46,7 @@
 
 4. Building
 
-    The pacakge comes bundled with a Code::Blocks project file. It can either
+    The pacakge comes bundled with a CodeLite project file. It can either
     be built with that or simply compiling the main.cpp file with any C++ 
     compiler should head the expected result.
     
@@ -58,4 +58,5 @@
 
 6. License 
 
-ezrc is distibuted under the GNU General Public License version 3. See COPYING.txt for details.
+    ezrc is distibuted under the GNU General Public License version 3. 
+    See COPYING.txt for details.

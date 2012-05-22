@@ -1,8 +1,7 @@
     
     ezrc
-    Version r1
-    
-    
+    Version r2
+        
 1. About
 
     ezrc is a command line utility that packs data as C++ source code.    

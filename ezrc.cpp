@@ -27,6 +27,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#define VERSION "r2"
+
 bool do_print_version = false;
 bool do_print_help = false;
 std::vector<std::string> input_files;

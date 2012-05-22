@@ -316,7 +316,7 @@ int main(int argc, char* argv[])
             throw std::runtime_error(msg.str());
         }            
                 
-        output << "// File generated with Iced Resource\n"
+        output << "// File generated with ezrc\n"
                << "\n"
                << "#include <string>\n"
                << "\n";

@@ -40,7 +40,7 @@ To use the string use a simple extern declararion like so:
 
     ezrc Toon.vert Toon.frag ToonGradient.png -o resources.cpp
 
-This will read the date from Toon.vert, Toon.frag and ToonGradient.png
+This will read the data from Toon.vert, Toon.frag and ToonGradient.png
 and write the file resources.cpp. The file will contain the variables 
 Toon_vert, Toon_frag and ToonGradient_png with the respective data.
 
@@ -48,9 +48,7 @@ Building
 --------
 
 All you need to build this package is a make and a C++ compiler. just invoke 
-make and it should build all you need. For convinience the package also comes
-with a CodeLite project. Finally, since the package consists of only one source
-file you can just compilte tha.
+make and it should build all you need.
     
 Errors, Bugs and Suggestions
 ----------------------------
@@ -62,5 +60,4 @@ https://github.com/rioki/ezrc
 License 
 -------
 
-ezrc is distibuted under the GNU General Public License version 3. 
-See COPYING.txt for details.
+ezrc is distibuted under the MIT License. 

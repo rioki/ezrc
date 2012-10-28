@@ -1,12 +1,29 @@
 
-UNAME = $(shell uname -o)
-ifeq ($(UNAME), Msys)
-	EXEEXT = .exe
+PACKAGE = ezrc
+VERSION = 0.2.0
+
+CXX      ?= g++ -std=c++0x
+CXXFLAGS += -DVERSION=\"$(VERSION)\"
+LDFLAGS  += 
+prefix   ?= /usr/local
+
+ifeq ($(MSYSTEM), MINGW32)
+  EXEEXT    = .exe  
+else
+  EXEEXT    =
 endif
 
-.PHONY: clean
+.PHONY: all clean install uninstall
 
-ezrc: ezrc.cpp
+ezrc$(EXEEXT): ezrc.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
 clean:
-	rm ezrc$(EXEEXT)
+	rm ezrc$(EXEEXT) *.o
+	
+install: ezrc$(EXEEXT)
+	mkdir -p $(prefix)/bin
+	cp ezrc$(EXEEXT) $(prefix)/bin
+
+uninstall:
+	rm $(prefix)/bin/ezrc$(EXEEXT)

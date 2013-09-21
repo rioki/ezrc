@@ -39,7 +39,7 @@ std::string output_file;
 void print_banner(std::ostream& os)
 {
     os << "ezrc - eazy resource compiler\n"
-          "Copyright (c) 2009 - 2012 Sean Farrell \n"
+          "Copyright (c) 2009 - 2013 Sean Farrell \n"
           "Version: " VERSION "\n";
 }
 

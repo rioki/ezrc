@@ -1,8 +1,2 @@
-*.o
-*.tags
 *.exe
-*.mk
-*.session
-/ezrc.txt
-/Debug
-/Release
+/README.c

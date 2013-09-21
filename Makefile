@@ -1,6 +1,6 @@
 
 PACKAGE = ezrc
-VERSION = 0.2.0
+VERSION = 0.3.0
 
 CXX      ?= g++ -std=c++0x
 CXXFLAGS += -DVERSION=\"$(VERSION)\"
@@ -18,6 +18,15 @@ endif
 ezrc$(EXEEXT): ezrc.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
 
+README.c: README.md ezrc$(EXEEXT)
+	ezrc README.md
+
+check: ezrc-check$(EXEEXT)
+	./ezrc-check
+	
+ezrc-check$(EXEEXT): test.cpp README.c
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+	
 clean:
 	rm ezrc$(EXEEXT) *.o
 	

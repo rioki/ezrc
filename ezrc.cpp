@@ -1,6 +1,6 @@
 //
 // ezrc - eazy resource compiler
-// Copyright (c) 2009 - 2012, Sean Farrell
+// Copyright (c) 2009 - 2013, Sean Farrell
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy 
 // of this software and associated documentation files (the "Software"), to deal 
@@ -36,7 +36,6 @@ std::vector<std::string> input_files;
 std::vector<std::string> input_data;
 std::string output_file;
 
-//------------------------------------------------------------------------------
 void print_banner(std::ostream& os)
 {
     os << "ezrc - eazy resource compiler\n"
@@ -44,7 +43,6 @@ void print_banner(std::ostream& os)
           "Version: " VERSION "\n";
 }
 
-//------------------------------------------------------------------------------
 void print_help(std::ostream& os)
 {
     os << "Usage:\n"
@@ -56,7 +54,6 @@ void print_help(std::ostream& os)
           "  --output -o     The file to output.\n";
 }
 
-//------------------------------------------------------------------------------
 bool is_alpha_num(const std::string& value)
 {
     for (unsigned int i = 0; i < value.size(); i++)
@@ -69,7 +66,6 @@ bool is_alpha_num(const std::string& value)
     return true;
 }
 
-//------------------------------------------------------------------------------
 std::string get_base_name(const std::string& path)
 {
     size_t pos = path.find_last_of(".");
@@ -79,7 +75,6 @@ std::string get_base_name(const std::string& path)
         return path.substr(0, pos);
 }
 
-//------------------------------------------------------------------------------
 void decode_arguments(unsigned int argc, char* argv[])
 {
     for (unsigned int i = 1; i < static_cast<unsigned int>(argc); i++)
@@ -150,7 +145,7 @@ void decode_arguments(unsigned int argc, char* argv[])
     
     if (output_file.empty() && input_files.size() == 1)
     {
-        output_file = get_base_name(input_files[0]) + ".cpp";
+        output_file = get_base_name(input_files[0]) + ".c";
     }
     if (output_file.empty())
     {
@@ -158,7 +153,6 @@ void decode_arguments(unsigned int argc, char* argv[])
     }
 }
 
-//------------------------------------------------------------------------------
 std::string read_file(const std::string& file)
 {
     std::string result;
@@ -181,7 +175,6 @@ std::string read_file(const std::string& file)
     return result;
 }
 
-//------------------------------------------------------------------------------
 std::vector<std::string> read_files(const std::vector<std::string>& files)
 {
     std::vector<std::string> result;
@@ -192,7 +185,6 @@ std::vector<std::string> read_files(const std::vector<std::string>& files)
     return result;
 }
 
-//------------------------------------------------------------------------------
 std::string normalize_name(const std::string& name)
 {
     std::string result(name.size(), '_');
@@ -206,7 +198,6 @@ std::string normalize_name(const std::string& name)
     return result;
 }
 
-//------------------------------------------------------------------------------
 char to_hex(char c)
 {
     switch (c)
@@ -249,7 +240,7 @@ char to_hex(char c)
     }
 }
 
-//------------------------------------------------------------------------------
+
 std::string to_hex_char(char c)
 {
     char low_nibble = c & 0x0f;
@@ -259,24 +250,27 @@ std::string to_hex_char(char c)
     return std::string("\\x") + to_hex(heigh_nibble) + to_hex(low_nibble);
 }
 
-//------------------------------------------------------------------------------
+
 void write_data(std::ostream& output, const std::string& file, const std::string& data)
 {
     std::string variable_name = normalize_name(file);
     output << "// " << file << ": " << data.size() << " bytes\n";
-    output << "std::string " << variable_name << " = \"";
+    output << "unsigned char " << variable_name << "[] = \"";
     for (unsigned int i = 0; i < data.size(); i++)
     {
         if (i % 20 == 0)
+        {
             output << "\"\n    \"";
+        }
         output << to_hex_char(data[i]);
         
     }
-    output << "\";\n";
-            
+    output << "\";\n";   
+    
+    output << "unsigned int " << variable_name << "_size = " << data.size() << ";\n";
 }
 
-//------------------------------------------------------------------------------
+
 void write_data(std::ostream& output, const std::vector<std::string>& files, const std::vector<std::string>& data)
 {
     assert(files.size() == data.size());
@@ -288,7 +282,7 @@ void write_data(std::ostream& output, const std::vector<std::string>& files, con
     }
 }
 
-//------------------------------------------------------------------------------
+
 int main(int argc, char* argv[])
 {
     try
@@ -320,9 +314,8 @@ int main(int argc, char* argv[])
         }            
                 
         output << "// File generated with ezrc\n"
-               << "\n"
-               << "#include <string>\n"
                << "\n";
+               
         
         write_data(output, input_files, input_data);
     

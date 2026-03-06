@@ -1,0 +1,64 @@
+name: MSBuild
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [x86, x64]
+        include:
+          - platform: x86
+            triplet: x86-windows
+          - platform: x64
+            triplet: x64-windows
+    runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+      VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Restore from cache and install vcpkg
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgGitCommitId: 40c0d758e1cc99a505b039a9a7e792154119c927
+    - name: 'Setup NuGet/Vcpkg Credentials'
+      working-directory: ${{steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT}}
+      shell: 'bash'
+      run: >
+        `vcpkg fetch nuget | tail -n 1` \
+          sources add \
+          -source "https://nuget.pkg.github.com/rioki/index.json" \
+          -storepasswordincleartext \
+          -name "GitHub" \
+          -username "rioki" \
+          -password "${{ secrets.VCPKG_PAT_TOKEN }}"
+        `vcpkg fetch nuget | tail -n 1` \
+          setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" \
+          -source "https://nuget.pkg.github.com/rioki/index.json"
+    - name: Integrate vcpkg 
+      working-directory: ${{steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT}}
+      run: vcpkg integrate install
+    - name: Build Debug
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m /p:Configuration=Debug /property:Platform=${{matrix.platform}} ezrc.sln
+    - name: Build Release
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m /p:Configuration=Release /property:Platform=${{matrix.platform}} ezrc.sln
+    - name: Test Debug
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: ${{matrix.platform}}/Debug/ezrc-test.exe
+    - name: Test Release
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: ${{matrix.platform}}/Release/ezrc-test.exe

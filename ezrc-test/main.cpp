@@ -52,6 +52,7 @@ std::string read_file(const std::filesystem::path& file)
 
 TEST(ezrc, math_glsl)
 {
+    std::cout << std::filesystem::path(PROJECT_DIR) / "math.glsl" << std::endl;
     auto reference = read_file(std::filesystem::path(PROJECT_DIR) / "math.glsl");
     auto result    = test::get_string_resource("math.glsl");
     EXPECT_EQ(reference, result);

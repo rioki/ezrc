@@ -1,4 +1,4 @@
-name: MSBuild
+name: CMake
 
 on:
   push:
@@ -14,13 +14,21 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [x86, x64]
+        triplet: [x86-windows, x64-windows, x64-linux, x64-macos]
         include:
-          - platform: x86
-            triplet: x86-windows
-          - platform: x64
-            triplet: x64-windows
-    runs-on: windows-latest
+          - triplet: x86-windows
+            system: windows-latest
+            mono: ""
+          - triplet: x64-windows
+            system: windows-latest
+            mono: ""
+          - triplet: x64-linux
+            system: ubuntu-latest
+            mono: "mono"
+          - triplet: x64-macos
+            system: macos-latest
+            mono: "mono"
+    runs-on: ${{ matrix.system }}
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
@@ -29,8 +37,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Install Mono on Linux
+      if: runner.os == 'Linux'
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y mono-complete
+    - name: Install Mono on macOS
+      if: runner.os == 'macOS'
+      run: brew install mono
+    - name: Install CMake
+      uses: lukka/get-cmake@latest
     - name: Restore from cache and install vcpkg
       uses: lukka/run-vcpkg@v11
       with:
@@ -39,22 +55,17 @@ jobs:
       shell: 'bash'
       run: |
         NUGET=$("$RUNVCPKG_VCPKG_ROOT/vcpkg" fetch nuget | tail -n 1)
-        echo "nuget path: $NUGET"
         "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
         "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
-    - name: Integrate vcpkg 
-      shell: 'bash'
-      run: |
-        "$RUNVCPKG_VCPKG_ROOT/vcpkg" integrate install
     - name: Build Debug
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m /p:Configuration=Debug /property:Platform=${{matrix.platform}} ezrc.sln
+      uses: lukka/run-cmake@v10
+      with:
+        configurePreset: 'ninja-debug'
+        buildPreset: 'ninja-debug'
+        testPreset: 'ninja-debug'
     - name: Build Release
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m /p:Configuration=Release /property:Platform=${{matrix.platform}} ezrc.sln
-    - name: Test Debug
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: bin/${{matrix.platform}}/Debug/ezrc-test.exe
-    - name: Test Release
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: bin/${{matrix.platform}}/Release/ezrc-test.exe
+      uses: lukka/run-cmake@v10
+      with:
+        configurePreset: 'ninja-release'
+        buildPreset: 'ninja-release'
+        testPreset: 'ninja-release'

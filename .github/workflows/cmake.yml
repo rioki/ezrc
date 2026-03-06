@@ -22,6 +22,9 @@ jobs:
           - triplet: x64-windows
             system: windows-latest
             mono: ""
+          - triplet: x64-linux
+            system: ubuntu-latest
+            mono: "mono"
     runs-on: ${{ matrix.system }}
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}

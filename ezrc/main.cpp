@@ -1,5 +1,5 @@
 // ezrc - eazy resource compiler
-// Copyright (c) 2009 - 2025, Sean Farrell
+// Copyright (c) 2009 - 2026, Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,7 +53,7 @@ void print_banner(std::ostream& out)
 void print_help(std::ostream& out)
 {
     tfm::format(out, "Usage:\n"
-                     "  ezrc [Options] <Input Files>\n"
+                     "  ezrc [Options] <Input YAML File>\n"
                      "\n"
                      "Options:\n"
                      "  --help    -h   This help message.\n"

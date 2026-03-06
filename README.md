@@ -1,65 +1,122 @@
+# ezrc
 
-erzc
-====
-        
-About
------
+## About
 
-ezrc is a command line utility that packs data as C source code.    
-This approach to data handling provides a robust and portable solution when 
-data is closely bound to source code. 
+`ezrc` is a command line utility that packs files into C++ source code.
 
-Usage
------
+This allows static resources such as shaders, images, or text files to be embedded directly into a program binary. The result is a robust and portable solution when application data is tightly coupled to source code.
 
-    ezrc [options] <files> 
-    
-### Options
-    
-* --help -h     Display a brief help and usage message.
-* --version -v  Display the program version and exit.
-* --output -o   Specify the output file to write. If only one input file is 
-                given the base name is appended with .c. If multiple input
-                files are specified ezrc will quit with an error.
+Resources are defined in a YAML file and compiled into a C++ header that exposes a simple lookup API.
 
-Example Usage
--------------
+---
 
-### A Single File
+## Usage
 
-    ezrc SunIcon.jpg
+```
+ezrc <config.yml>
+```
 
-This will read SunIcon.jpg and create the file SunIcon.c. In this file 
-there will be a unsigned char SunIcon_jpg[] with the contents and a
-unsigned int SunIcon_jpg_size with the size in bytes of contents.
+The input is a YAML configuration file describing the namespace and files to embed.
 
-To use the resource use a simple extern declararion like so:
+---
 
-    extern unsigned char SunIcon_jpg[];
-    extern unsinged int SunIcon_jpg_size;
-    
-### Multiple Files
+## Configuration
 
-    ezrc Toon.vert Toon.frag ToonGradient.png -o resources.c
+Example configuration:
 
-This will read the data from Toon.vert, Toon.frag and ToonGradient.png
-and write the file resources.c. The file will contain the variables 
-Toon_vert, Toon_frag and ToonGradient_png with the respective data.
+```yaml
+namespace: test
+files:
+  - lena.png
+  - math.glsl
+```
 
-Building
---------
+* `namespace`
+  The C++ namespace used for the generated API.
 
-All you need to build this package is a make and a C++ compiler. just invoke 
-make and it should build all you need.
-    
-Errors, Bugs and Suggestions
-----------------------------
+* `files`
+  A list of files that will be embedded into the generated source.
 
-Please report any errors, bugs and suggestions to:
+---
 
-https://github.com/rioki/ezrc
+## Generated API
 
-License 
--------
+`ezrc` generates a C++ header exposing a simple resource lookup function.
 
-ezrc is distibuted under the MIT License. 
+Example:
+
+```cpp
+// File generated with ezrc
+
+#pragma once
+
+#include <string_view>
+
+namespace test
+{
+    std::string_view get_string_resource(std::string_view file);
+}
+```
+
+The `file` parameter corresponds to the original filename specified in the YAML configuration.
+
+Example usage:
+
+```cpp
+#include "resources.h"
+
+auto shader = test::get_string_resource("math.glsl");
+```
+
+The returned `std::string_view` references the embedded resource data.
+
+---
+
+## Example
+
+Given the configuration:
+
+```yaml
+namespace: resources
+files:
+  - Toon.vert
+  - Toon.frag
+  - ToonGradient.png
+```
+
+Running
+
+```
+ezrc resources.yml
+```
+
+generates C++ code embedding the listed files and exposing them through the namespace `resources`.
+
+---
+
+## Building
+
+`ezrc` can be built in several ways.
+
+### Using vcpkg
+
+```
+vcpkg install ezrc
+```
+
+### Using CMake
+
+```
+cmake -B build
+cmake --build build
+```
+
+### Using Visual Studio
+
+Open the repository folder in Visual Studio and build the solution.
+
+---
+
+## License
+
+`ezrc` is distributed under the MIT License.

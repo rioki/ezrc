@@ -18,12 +18,16 @@ jobs:
         include:
           - triplet: x86-windows
             system: windows-latest
+            mono: ""
           - triplet: x64-windows
             system: windows-latest
+            mono: ""
     runs-on: ${{ matrix.system }}
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+      VCPKG_USER: rioki
+      VCPKG_FEED_URL: https://nuget.pkg.github.com/rioki/index.json
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -34,19 +38,11 @@ jobs:
       with:
         vcpkgGitCommitId: c01dc6ea7353758f2ed70df0bc29c97dfc650b3a
     - name: 'Setup NuGet/Vcpkg Credentials'
-      working-directory: ${{steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT}}
       shell: 'bash'
-      run: >
-        `vcpkg fetch nuget | tail -n 1` \
-          sources add \
-          -source "https://nuget.pkg.github.com/rioki/index.json" \
-          -storepasswordincleartext \
-          -name "GitHub" \
-          -username "rioki" \
-          -password "${{ secrets.VCPKG_PAT_TOKEN }}"
-        `vcpkg fetch nuget | tail -n 1` \
-          setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" \
-          -source "https://nuget.pkg.github.com/rioki/index.json"
+      run: |
+        NUGET=$("$RUNVCPKG_VCPKG_ROOT/vcpkg" fetch nuget | tail -n 1)
+        ${{ matrix.mono }} "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
+        ${{ matrix.mono }} "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
     - name: Build Debug
       uses: lukka/run-cmake@v10
       with:

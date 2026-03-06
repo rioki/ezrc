@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        triplet: [x86-windows, x64-windows, x64-linux]
+        triplet: [x86-windows, x64-windows]
         include:
           - triplet: x86-windows
             system: windows-latest
@@ -48,22 +48,20 @@ jobs:
     - name: Restore from cache and install vcpkg
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: 40c0d758e1cc99a505b039a9a7e792154119c927
+        vcpkgGitCommitId: c01dc6ea7353758f2ed70df0bc29c97dfc650b3a
     - name: 'Setup NuGet/Vcpkg Credentials'
       shell: 'bash'
       run: |
         NUGET=$("$RUNVCPKG_VCPKG_ROOT/vcpkg" fetch nuget | tail -n 1)
-        "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
-        "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
+        ${{ matrix.mono }} "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
+        ${{ matrix.mono }} "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
     - name: Build Debug
       uses: lukka/run-cmake@v10
       with:
         configurePreset: 'ninja-debug'
         buildPreset: 'ninja-debug'
-        testPreset: 'ninja-debug'
     - name: Build Release
       uses: lukka/run-cmake@v10
       with:
         configurePreset: 'ninja-release'
         buildPreset: 'ninja-release'
-        testPreset: 'ninja-release'

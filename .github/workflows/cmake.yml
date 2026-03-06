@@ -13,6 +13,7 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         triplet: [x86-windows, x64-windows, x64-linux]
         include:

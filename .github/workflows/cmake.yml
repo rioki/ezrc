@@ -13,6 +13,7 @@ permissions:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         triplet: [x86-windows, x64-windows]
         include:
@@ -44,8 +45,8 @@ jobs:
       shell: 'bash'
       run: |
         NUGET=$("$RUNVCPKG_VCPKG_ROOT/vcpkg" fetch nuget | tail -n 1)
-        ${{ matrix.mono }} "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
-        ${{ matrix.mono }} "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
+        "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
+        "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
     - name: Build Debug
       uses: lukka/run-cmake@v10
       with:

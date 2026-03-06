@@ -58,7 +58,7 @@ jobs:
       run: msbuild /m /p:Configuration=Release /property:Platform=${{matrix.platform}} ezrc.sln
     - name: Test Debug
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: ${{matrix.platform}}/Debug/ezrc-test.exe
+      run: bin/${{matrix.platform}}/Debug/ezrc-test.exe
     - name: Test Release
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: ${{matrix.platform}}/Release/ezrc-test.exe
+      run: bin/${{matrix.platform}}/Release/ezrc-test.exe

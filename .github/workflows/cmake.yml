@@ -14,7 +14,7 @@ jobs:
   build:
     strategy:
       matrix:
-        triplet: [x86-windows, x64-windows, x64-linux, x64-macos]
+        triplet: [x86-windows, x64-windows, x64-linux]
         include:
           - triplet: x86-windows
             system: windows-latest
@@ -24,9 +24,6 @@ jobs:
             mono: ""
           - triplet: x64-linux
             system: ubuntu-latest
-            mono: "mono"
-          - triplet: x64-macos
-            system: macos-latest
             mono: "mono"
     runs-on: ${{ matrix.system }}
     env:

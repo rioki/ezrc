@@ -1,2 +1,12 @@
-*.exe
-/README.c
+
+# Build Outputs
+/bin
+.int
+/build
+
+# vcpkg
+/vcpkg_installed
+
+# Visual Studio Specials
+/.vs
+*.vcxproj.user

@@ -35,6 +35,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Install Mono on Linux
+      if: runner.os == 'Linux'
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y mono-complete
+    - name: Install Mono on macOS
+      if: runner.os == 'macOS'
+      run: brew install mono
     - name: Install CMake
       uses: lukka/get-cmake@latest
     - name: Restore from cache and install vcpkg
@@ -45,8 +53,8 @@ jobs:
       shell: 'bash'
       run: |
         NUGET=$("$RUNVCPKG_VCPKG_ROOT/vcpkg" fetch nuget | tail -n 1)
-        "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
-        "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
+        ${{ matrix.mono }} "$NUGET" sources add -source "${{env.VCPKG_FEED_URL}}" -storepasswordincleartext -name "GitHub" -username "${{env.VCPKG_USER}}" -password "${{ secrets.VCPKG_PAT_TOKEN }}"
+        ${{ matrix.mono }} "$NUGET" setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" -source "${{env.VCPKG_FEED_URL}}"
     - name: Build Debug
       uses: lukka/run-cmake@v10
       with:

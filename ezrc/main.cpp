@@ -141,7 +141,6 @@ Options parse_arguments(int argc, char* argv[])
 struct ResourceYml
 {
     std::string                        name_space = "ezrc";
-    std::string                        api        = "";
     std::vector<std::filesystem::path> files;
 };
 
@@ -162,11 +161,6 @@ ResourceYml read_resouces_yml(const std::filesystem::path& resouces_yml)
     if (yaml.contains("namespace"))
     {
         resouces.name_space = yaml.at("namespace").get_value<std::string>();
-    }
-
-    if (yaml.contains("api"))
-    {
-        resouces.api = yaml.at("api").get_value<std::string>();
     }
 
     for (const auto& yfile : yaml.at("files"))

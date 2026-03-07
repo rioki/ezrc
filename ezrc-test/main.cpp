@@ -52,9 +52,8 @@ std::string read_file(const std::filesystem::path& file)
 
 TEST(ezrc, math_glsl)
 {
-    std::cout << std::filesystem::path(PROJECT_DIR) / "math.glsl" << std::endl;
     auto reference = read_file(std::filesystem::path(PROJECT_DIR) / "math.glsl");
-    auto result    = test::get_string_resource("math.glsl");
+    auto result    = test::get_resource("math.glsl");
     EXPECT_EQ(reference, result);
 }
 
@@ -68,7 +67,7 @@ TEST(ezrc, lena_png)
     FreeImage_Initialise();
     FreeImage_SetOutputMessage(free_image_trace);
 
-    auto data = test::get_string_resource("lena.png");
+    auto data = test::get_resource("lena.png");
 
     auto stream = FreeImage_OpenMemory(reinterpret_cast<BYTE*>(const_cast<char*>(data.data())), static_cast<DWORD>(data.size()));
     auto bitmap = FreeImage_LoadFromMemory(FIF_PNG, stream, JPEG_ACCURATE);
@@ -78,6 +77,19 @@ TEST(ezrc, lena_png)
 
     EXPECT_EQ(FreeImage_GetWidth(bitmap), 250u);
     EXPECT_EQ(FreeImage_GetHeight(bitmap), 250u);
+}
+
+const auto premina_variable = std::string(test::get_resource("math.glsl"));
+
+TEST(ezrc, pre_main)
+{
+    auto reference = read_file(std::filesystem::path(PROJECT_DIR) / "math.glsl");;
+    EXPECT_EQ(reference, premina_variable);
+}
+
+TEST(ezrc, invalid_file)
+{
+    EXPECT_THROW(test::get_resource("lena.jpg"), std::runtime_error);
 }
 
 int main(int argc, char** argv)

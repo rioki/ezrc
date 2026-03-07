@@ -141,7 +141,6 @@ Options parse_arguments(int argc, char* argv[])
 struct ResourceYml
 {
     std::string                        name_space = "ezrc";
-    std::string                        api        = "";
     std::vector<std::filesystem::path> files;
 };
 
@@ -162,11 +161,6 @@ ResourceYml read_resouces_yml(const std::filesystem::path& resouces_yml)
     if (yaml.contains("namespace"))
     {
         resouces.name_space = yaml.at("namespace").get_value<std::string>();
-    }
-
-    if (yaml.contains("api"))
-    {
-        resouces.api = yaml.at("api").get_value<std::string>();
     }
 
     for (const auto& yfile : yaml.at("files"))
@@ -258,11 +252,22 @@ void write_header(std::ostream& out, const ResourceYml& resoruce_yml)
     tfm::format(out, "// File generated with ezrc\n\n"
                      "#pragma once\n\n"
                      "#include <string_view>\n\n");
-
-    tfm::format(out, "namespace %s \n"
-                     "{\n\n", resoruce_yml.name_space);
-    tfm::format(out, "    %s std::string_view get_string_resource(const std::string_view file);", resoruce_yml.api);
-    tfm::format(out, "}\n");
+    tfm::format(out, "namespace %s \n", resoruce_yml.name_space);
+    tfm::format(out, "{\n"
+                     "    //! Retrieves the content of an embedded resource file as a string view.\n"
+                     "    //!\n"
+                     "    //! This function provides read-only access to files embedded into the binary\n"
+                     "    //! by the ezrc compiler. The returned view points directly into the\n"
+                     "    //! read-only data section and remains valid for the entire program lifetime.\n"
+                     "    //!\n"
+                     "    //! @param file The filename of the resource\n"
+                     "    //!\n"
+                     "    //! @return A non-owning view into the resource data. The view is null-terminated\n"
+                     "    //!         so `.data()` can be used with C-style APIs that expect null-terminated strings.\n"
+                     "    //!\n"
+                     "    //! @throw resource_not_found If no resource with the given @p file name exists.\n"
+                     "    std::string_view get_resource(const std::string_view file);\n"
+                     "}\n");
 }
 
 void write_cpp(std::ostream& out, const ResourceYml& resoruce_yml, const std::vector<Resource>& resources)
@@ -270,21 +275,24 @@ void write_cpp(std::ostream& out, const ResourceYml& resoruce_yml, const std::ve
     tfm::format(out, "// File generated with ezrc\n\n"
                      "#include <array>\n"
                      "#include <map>\n"
+                     "#include <stdexcept>\n"
                      "#include <string_view>\n\n");
 
     tfm::format(out, "namespace %s \n"
                      "{\n\n", resoruce_yml.name_space);
+    tfm::format(out, "    std::string_view get_resource(const std::string_view file)\n"
+                     "    {\n");
 
     for (const auto& resource : resources)
     {
-        tfm::format(out, "const auto %s_data = std::array<unsigned char, %d>{\n    ", resource.var_name, resource.data.size() + 1);
+        tfm::format(out, "        static const auto %s_data = std::array<unsigned char, %d>{\n            ", resource.var_name, resource.data.size() + 1);
 
         std::size_t col = 0;
         for (unsigned char c : resource.data)
         {
             if (col == 12)
             {
-                tfm::format(out, "%s,\n    ", to_hex_literal(c));
+                tfm::format(out, "%s,\n            ", to_hex_literal(c));
                 col = 0;
             }
             else
@@ -294,19 +302,22 @@ void write_cpp(std::ostream& out, const ResourceYml& resoruce_yml, const std::ve
             }
         }
 
-        tfm::format(out, "0x00\n};\n");
+        tfm::format(out, "0x00\n        };\n\n");
     }
 
-    tfm::format(out, "    const auto resource_table = std::map<std::string_view, std::string_view>{\n");
+    tfm::format(out, "        static const auto resource_table = std::map<std::string_view, std::string_view>{\n");
     for (const auto& resource : resources)
     {
-        tfm::format(out, "        {%s, std::string_view(reinterpret_cast<const char*>(%s_data.data()), %s_data.size()-1)},\n", resource.path.filename(), resource.var_name, resource.var_name);
+        tfm::format(out, "            {%s, std::string_view(reinterpret_cast<const char*>(%s_data.data()), %s_data.size()-1)},\n", resource.path.filename(), resource.var_name, resource.var_name);
     }
-    tfm::format(out, "    };\n\n");
+    tfm::format(out, "        };\n\n");
 
-    tfm::format(out, "    std::string_view get_string_resource(const std::string_view file)\n"
-                     "    {\n"
-                     "        return resource_table.at(file);\n"
+    tfm::format(out, "        auto i = resource_table.find(file);\n"
+                     "        if (i == end(resource_table))\n"
+                     "        {\n"
+                     "            throw std::runtime_error(std::string(\"Failed to resolve resource \") + std::string(file));\n"
+                     "        }\n"
+                     "        return i->second;\n"
                      "    }\n");
 
     tfm::format(out, "}\n");
